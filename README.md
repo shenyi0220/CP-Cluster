@@ -93,7 +93,7 @@ MMCV_WITH_OPS=1 pip install -e .
 
 Make sure that the MMCV with CP-Cluster has been successfully installed.
 
-Download code from https://github.com/shenyi0220/mmdetection (Cut down by 9/26/2021 from main branch with some config file modifications to call Soft-NMS/CP-Cluster)
+Download code from https://github.com/shenyi0220/mmdetection (Cut down by 9/26/2021 from main branch with some config file modifications to call Soft-NMS/CP-Cluster), and install all the dependancies accordingly.
 
 Download models from model zoo
 
@@ -105,9 +105,21 @@ python tools/test.py ./configs/faster_rcnn/faster_rcnn_r50_fpn_2x_coco.py ./chec
 To check original metrics with NMS, you can switch the model config back to use default NMS.
 
 To check Soft-NMS metrics, just re-compile with mmcv without CP-Cluster modifications.
+
+## Reproduce Yolov5
+
+Make sure that the MMCV with CP-Cluster has been successfully installed.
+
+Download code from https://github.com/shenyi0220/yolov5 (Cut down by 11/9/2021 from main branch, replacing the default torchvision.nms with CP-Cluster from mmcv), and install all the dependancies accordingly.
+
+Run below command to reproduce the CP-Cluster exp with yolov5s-v6
+~~~
+python val.py --data coco.yaml --conf 0.001 --iou 0.6 --weights yolov5s.pt --batch-size 32
+~~~
+
 ## License
 
-For the time being, this implementation is published with NVIDIA proprietary license, and the only usage of the source code is to reproduce the result of CP-Cluster. For any possible commercial use and redistribution of the code, ps contact ashen@nvidia.com
+For the time being, this implementation is published with NVIDIA proprietary license, and the only usage of the source code is to reproduce the experiments of CP-Cluster. For any possible commercial use and redistribution of the code, pls contact ashen@nvidia.com
 
 ## Citation
 
