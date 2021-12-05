@@ -1,8 +1,8 @@
 # CP-Cluster
 
 Confidence Propagation Cluster aims to replace NMS-based methods as a better box fusion framework in 2D/3D Object detection, Instance Segmentation:
-> [**Confidence Propagation Cluster: Unleash the Full Potential of Object Detectors**](arxivlink to do),            
-> Yichun Shen*, Wanli Jiang*, Zhen Xu, Rundong Li, Junghyun Kwon, Siyi Li,        
+> [**Confidence Propagation Cluster: Unleash the Full Potential of Object Detectors**](https://arxiv.org/abs/2112.00342),
+> Yichun Shen*, Wanli Jiang*, Zhen Xu, Rundong Li, Junghyun Kwon, Siyi Li,
 
 
 Contact: [ashen@nvidia.com](mailto:ashen@nvidia.com). Welcome for any questions and comments!
