@@ -39,7 +39,7 @@ Inspired by belief propagation (BP), we propose the Confidence Propagation Clust
 |Yolov5m      |    45.2    |     45.3         |      45.5       |
 |Yolov5l      |    48.8    |     48.8         |      49.1       |
 |Yolov5x      |    50.7    |     50.8         |      51.0       |
-|Yolov5s_1280 |    44.5    |     50.8         |      44.8       |
+|Yolov5s_1280 |    44.5    |     44.6         |      44.8       |
 |Yolov5m_1280 |    51.1    |     51.1         |      51.3       |
 |Yolov5l_1280 |    53.6    |     53.7         |      53.8       |
 |Yolov5x_1280 |    54.7    |     54.8         |      55.0       |
