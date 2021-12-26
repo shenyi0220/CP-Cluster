@@ -66,7 +66,7 @@ Inspired by belief propagation (BP), we propose the Confidence Propagation Clust
 Clone the mmcv repo from https://github.com/shenyi0220/mmcv (Cut down by 9/28/2021 from main branch with no extra modifications)
 
 
-Copy the implementation of "cp_cluster_cpu" in src/nms.cpp to the mmcv nms code("mmcv/ops/csrc/pytorch/nms.cpp")
+Copy the implementation of "cp_cluster_cpu" in "src/mmcv/nms.cpp" to the mmcv nms code("mmcv/ops/csrc/pytorch/nms.cpp")
 
 Borrow the "soft_nms_cpu" API by calling "cp_cluster_cpu" rather than orignal Soft-NMS implementations, so that modify the code like below:
 ~~~
