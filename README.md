@@ -89,7 +89,7 @@ MMCV_WITH_OPS=1 pip install -e .
 ~~~
 
 
-## Reproduce Object Detection and Instance Segmentation in MMDetection
+## Reproduce CP-Cluster Object Detection and Instance Segmentation in MMDetection
 
 Make sure that the MMCV with CP-Cluster has been successfully installed.
 
@@ -106,7 +106,7 @@ To check original metrics with NMS, you can switch the model config back to use 
 
 To check Soft-NMS metrics, just re-compile with mmcv without CP-Cluster modifications.
 
-## Reproduce Yolov5
+## Reproduce CP-Cluster exps with yolov5
 
 Make sure that the MMCV with CP-Cluster has been successfully installed.
 
@@ -116,6 +116,38 @@ Run below command to reproduce the CP-Cluster exp with yolov5s-v6
 ~~~
 python val.py --data coco.yaml --conf 0.001 --iou 0.6 --weights yolov5s.pt --batch-size 32
 ~~~
+
+## Reproduce CP-Cluster exps with Centernet
+Clone the Centernet repo from https://github.com/shenyi0220/centernet-cp-cluster (Added CP-Cluster compatible utilities)
+
+Prepare and configure the env according to https://github.com/shenyi0220/centernet-cp-cluster/blob/main/readme/INSTALL.md (Similar to original repo), suggesting Pytorch 1.7
+
+Copy the CP-Cluster implementation("def cp_cluster") from "src/centernet/nms.pyx" to the centernet nms source file("src/lib/external/nms.pyx"), replacing the below APIs:
+~~~
+def cp_cluster(np.ndarray[float, ndim=2] boxes, float Nt=0.5, float threshold=0.01,
+               int opt_sna=0, float wfa_threshold=0.8, int opt_sai=0):
+    return soft_nms(boxes, 0.5, Nt, threshold, 1)
+~~~
+
+Compile the nms lib with below command:
+~~~
+cd src/lib/external
+make
+~~~
+
+### Hourglass model
+
+python test.py ctdet --exp_id coco_hourglass_bp --arch hourglass --keep_res --nms --pre_cluster_method empty --filter_threshold 0.05 --nms_opt_sna 1 --nms_sna_threshold 0.8 --load_model ../models/ctdet_coco_hg.pth
+
+### Hourglass model with flip and multi-scale
+
+python test.py ctdet --exp_id coco_hourglass_bp --arch hourglass --keep_res --nms --pre_cluster_method empty --filter_threshold 0.05 --nms_opt_sna 1 --nms_sna_threshold 0.8 --load_model ../models/ctdet_coco_hg.pth --flip_test --test_scales 0.5,0.75,1,1.25,1.5
+
+### DLA-34 model
+python test.py ctdet --exp_id coco_dla_exp1 --arch hourglass --keep_res --nms --pre_cluster_method empty --filter_threshold 0.05 --nms_opt_sna 1 --nms_sna_threshold 0.8 --load_model ../models/ctdet_coco_dla_2x.pth
+
+### DLA-34 model with flip and multi-scale
+python test.py ctdet --exp_id coco_dla_exp1 --arch hourglass --keep_res --nms --pre_cluster_method empty --filter_threshold 0.05 --nms_opt_sna 1 --nms_sna_threshold 0.8 --load_model ../models/ctdet_coco_dla_2x.pth --flip_test --test_scales 0.5,0.75,1,1.25,1.5
 
 ## License
 
