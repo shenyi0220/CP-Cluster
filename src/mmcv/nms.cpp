@@ -87,7 +87,7 @@ Tensor cp_cluster_cpu(Tensor boxes, Tensor scores, Tensor dets,
       iou_thresholds[1] = iou_thresholds[0] + 0.2f;
       break;
     case 3:
-      iou_thresholds[2] = iou_thresholds[0] + 0.2f;
+      iou_thresholds[1] = iou_thresholds[0] + 0.2f;
       max_suppress_time = 1.99f; // Suppression from boxA to boxB can happen twice.
       break;
   }
