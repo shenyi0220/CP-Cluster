@@ -71,7 +71,8 @@ Tensor cp_cluster_cpu(Tensor boxes, Tensor scores, Tensor dets,
   Tensor inds_t = at::arange(nboxes, boxes.options().dtype(at::kLong));
   auto inds = inds_t.data_ptr<int64_t>();
 
-  // Set up main configs based on opt_id(config1, config2, config3).
+  // Set up main configs based on opt_id(config1, config2, config3, config4).
+  // Config 4 will incorporate better AP50 but less improvement on AP75.
   // By default it's config1.
   int64_t opt_max_iter = 2;
   float max_suppress_time = 0.99f;// Suppression from boxA to boxB can only happen once.
@@ -88,6 +89,9 @@ Tensor cp_cluster_cpu(Tensor boxes, Tensor scores, Tensor dets,
       break;
     case 3:
       iou_thresholds[1] = iou_thresholds[0] + 0.2f;
+      max_suppress_time = 1.99f; // Suppression from boxA to boxB can happen twice.
+      break;
+    case 4:
       max_suppress_time = 1.99f; // Suppression from boxA to boxB can happen twice.
       break;
   }
