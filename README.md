@@ -144,10 +144,6 @@ python test.py ctdet --exp_id coco_dla_exp1 --arch hourglass --keep_res --nms --
 ### DLA-34 model with flip and multi-scale
 python test.py ctdet --exp_id coco_dla_exp1 --arch hourglass --keep_res --nms --pre_cluster_method empty --filter_threshold 0.05 --nms_opt_sna 1 --nms_sna_threshold 0.8 --load_model ../models/ctdet_coco_dla_2x.pth --flip_test --test_scales 0.5,0.75,1,1.25,1.5
 
-## License
-
-For the time being, this implementation is published with NVIDIA proprietary license, and the only usage of the source code is to reproduce the experiments of CP-Cluster. For any possible commercial use and redistribution of the code, pls contact ashen@nvidia.com
-
 ## Open Source Limitation
 
 Due to proprietary and patent limitations, for the time being, only CPU implementation of CP-Cluster is open sourced. Full GPU-implementation and looser open source license are in application process.
