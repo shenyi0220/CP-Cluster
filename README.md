@@ -152,13 +152,3 @@ For the time being, this implementation is published with NVIDIA proprietary lic
 
 Due to proprietary and patent limitations, for the time being, only CPU implementation of CP-Cluster is open sourced. Full GPU-implementation and looser open source license are in application process.
 
-## Citation
-
-If you find this project useful for your research, please use the following BibTeX entry.
-
-    @inproceedings{yichun2021cpcluster,
-      title={Confidence Propagation Cluster: Unleash Full Potential of Object Detectors},
-      author={Yichun Shen, Wanli Jiang, Zhen Xu, Rundong Li, Junghyun Kwon, Siyi Li},
-      booktitle={arXiv preprint arXiv:2112.00342},
-      year={2021}
-    }
