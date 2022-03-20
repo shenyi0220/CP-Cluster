@@ -1,16 +1,21 @@
-/*
+ /*
+ * SPDX-FileCopyrightText: Copyright (c) 2021 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+ * SPDX-License-Identifier: LicenseRef-NvidiaProprietary
+ *
+ * NVIDIA CORPORATION, its affiliates and licensors retain all intellectual
+ * property and proprietary rights in and to this material, related 
+ * documentation and any modifications thereto. Any use, reproduction, 
+ * disclosure or distribution of this material and related documentation
+ * without an express license agreement from NVIDIA CORPORATION or 
+ * its affiliates is strictly prohibited.
  * This source code file is only allowed to repro exps of cp-cluster.
- */
+*/
 #include "pytorch_cpp_helper.hpp"
-
-#include <vector>
-#include <algorithm>
-
-using namespace std;
+#include "pytorch_device_registry.hpp"
 
 Tensor cp_cluster_cpu(Tensor boxes, Tensor scores, Tensor dets,
-                   float iou_threshold, float min_score,
-                   int offset, float wfa_thresh, int opt_id) {
+                      float iou_threshold, float min_score,
+                      int offset, float wfa_thresh, int tune_coords, int opt_id) {
   /*
   ** Implementation of Confidence Propagation Bounding Boxes Cluster for Object Detectors.
   **
@@ -21,6 +26,7 @@ Tensor cp_cluster_cpu(Tensor boxes, Tensor scores, Tensor dets,
   ** -min_score: The miminum confidence value to filter out too weak boxes.
   ** -offset: The offset used in IOU calculation, following the MMCV style.
   ** -wfa_thresh: The IOU threshold to distinguish weak friends.
+  ** -tune_coords: Whether update coordinates of bboxes with positive messages.
   ** -opt_id: The config options(1-3), as corresponds to the Config1-Config3 described in the paper.
   **
   */
@@ -72,7 +78,7 @@ Tensor cp_cluster_cpu(Tensor boxes, Tensor scores, Tensor dets,
   iou_thresholds[1] = iou_thresholds[0] + 0.1f;
   neg_strategies[0] = 0;
   neg_strategies[1] = 1;
-  assert(opt_id == 1 || opt_id==2 || opt_id==3);
+  assert(opt_id == 1 || opt_id==2 || opt_id==3 || opt_id==4);
   switch(opt_id) {
     case 1:
       break;
@@ -143,16 +149,26 @@ Tensor cp_cluster_cpu(Tensor boxes, Tensor scores, Tensor dets,
             positive_msgs[6*i + 3] = y1[pos];
             positive_msgs[6*i + 4] = x2[pos];
             positive_msgs[6*i + 5] = y2[pos];
+            //positive_msgs[6*i + 2] = positive_msgs[6*i + 2] + (x1[pos] - ix1);
+            //positive_msgs[6*i + 3] = positive_msgs[6*i + 3] + (y1[pos] - iy1);
+            //positive_msgs[6*i + 4] = positive_msgs[6*i + 4] + (x2[pos] - ix2);
+            //positive_msgs[6*i + 5] = positive_msgs[6*i + 5] + (y2[pos] - iy2);
           }
         }
       }
     }
     for (int64_t i = 0; i < nboxes; i++) {
       sc[i] = sc[i] + alphas[iter] * (1.0 - sc[i]) * (positive_msgs[6*i + 1] / (positive_msgs[6*i + 1] + 1.0)) * positive_msgs[6*i + 0];
-      //x1[i] = (x1[i] * sc[i] + positive_msgs[6*i + 0] * positive_msgs[6*i + 2]) / (sc[i] + positive_msgs[6*i + 0]);
-      //y1[i] = (y1[i] * sc[i] + positive_msgs[6*i + 0] * positive_msgs[6*i + 3]) / (sc[i] + positive_msgs[6*i + 0]);
-      //x2[i] = (x2[i] * sc[i] + positive_msgs[6*i + 0] * positive_msgs[6*i + 4]) / (sc[i] + positive_msgs[6*i + 0]);
-      //y2[i] = (y2[i] * sc[i] + positive_msgs[6*i + 0] * positive_msgs[6*i + 5]) / (sc[i] + positive_msgs[6*i + 0]);
+      //x1[i] = x1[i] + positive_msgs[6*i + 2] / (positive_msgs[6*i + 1] + 0.01);
+      //y1[i] = y1[i] + positive_msgs[6*i + 3] / (positive_msgs[6*i + 1] + 0.01);
+      //x2[i] = x2[i] + positive_msgs[6*i + 4] / (positive_msgs[6*i + 1] + 0.01);
+      //y2[i] = y2[i] + positive_msgs[6*i + 5] / (positive_msgs[6*i + 1] + 0.01);
+      if (tune_coords == 1) {
+        x1[i] = (x1[i] * sc[i] + positive_msgs[6*i + 0] * positive_msgs[6*i + 2]) / (sc[i] + positive_msgs[6*i + 0]);
+        y1[i] = (y1[i] * sc[i] + positive_msgs[6*i + 0] * positive_msgs[6*i + 3]) / (sc[i] + positive_msgs[6*i + 0]);
+        x2[i] = (x2[i] * sc[i] + positive_msgs[6*i + 0] * positive_msgs[6*i + 4]) / (sc[i] + positive_msgs[6*i + 0]);
+        y2[i] = (y2[i] * sc[i] + positive_msgs[6*i + 0] * positive_msgs[6*i + 5]) / (sc[i] + positive_msgs[6*i + 0]);
+      }
       if (negative_msgs[3*i + 0] > 0.01f) {
         sc[i] = sc[i] - betas[iter] * sc[i] * negative_msgs[3*i + 0];
         auto idx_suppress = static_cast<int64_t>(negative_msgs[3*i + 2]);
@@ -213,3 +229,8 @@ Tensor cp_cluster_cpu(Tensor boxes, Tensor scores, Tensor dets,
 
   return inds_t.slice(0, 0, nboxes);
 }
+
+Tensor cp_cluster_impl(Tensor boxes, Tensor scores, Tensor dets,
+                       float iou_threshold, float min_score,
+                       int offset, float wfa_thresh, int tune_coords, int opt_id);
+REGISTER_DEVICE_IMPL(cp_cluster_impl, CPU, cp_cluster_cpu);

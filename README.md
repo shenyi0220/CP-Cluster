@@ -1,8 +1,14 @@
+
+
 # CP-Cluster
+Confidence Propagation Cluster aims to replace NMS-based methods as a better box fusion framework in 2D/3D Object detection, Instance Segmentation:
+> [**Confidence Propagation Cluster: Unleash the Full Potential of Object Detectors**](https://arxiv.org/abs/2112.00342),
+> Yichun Shen, Wanli Jiang, Zhen Xu, Rundong Li, Junghyun Kwon, Siyi Li,
 
+## Updates
+- **Mar 3rd, 2022:** Accepted by CVPR 2022
 
-
-## Abstract 
+## Abstract
 
 It’s been a long history that most object detection methods obtain objects by using the non-maximum suppression(NMS) and its improved versions like Soft-NMS to remove redundant bounding boxes. We challenge those NMS-based methods from three aspects: 1) The bounding box with highest confidence value may not be the true positive having the biggest overlap with the ground-truth box. 2) Not only suppression is required for redundant boxes, but also confidence enhancement is needed for those true positives. 3) Sorting candidate boxes by confidence values is not necessary so that full parallelism is achievable.
 
@@ -61,20 +67,27 @@ Inspired by belief propagation (BP), we propose the Confidence Propagation Clust
 Clone the mmcv repo from https://github.com/shenyi0220/mmcv (Cut down by 9/28/2021 from main branch with no extra modifications)
 
 
-Copy the implementation of "cp_cluster_cpu" in "src/mmcv/nms.cpp" to the mmcv nms code("mmcv/ops/csrc/pytorch/nms.cpp")
+Copy the implementation of "cp_cluster_cpu" in "mmcv/ops/csrc/pytorch/cpu/nms.cpp" to the mmcv nms code("mmcv/ops/csrc/pytorch/cpu/nms.cpp")
 
-Borrow the "soft_nms_cpu" API by calling "cp_cluster_cpu" rather than orignal Soft-NMS implementations, so that modify the code like below:
+Borrow the "soft_nms_cpu" API by calling "cp_cluster_cpu" rather than orignal Soft-NMS implementations, so that modify "mmcv/ops/csrc/pytorch/nms.cpp" like below:
 ~~~
-@@ -186,8 +186,8 @@ Tensor softnms(Tensor boxes, Tensor scores, Tensor dets, float iou_threshold,
-   if (boxes.device().is_cuda()) {
-     AT_ERROR("softnms is not implemented on GPU");
-   } else {
--    return softnms_cpu(boxes, scores, dets, iou_threshold, sigma, min_score,
--                       method, offset);
-+    return cp_cluster_cpu(boxes, scores, dets, iou_threshold, min_score,
-+                          offset, 0.8, 3);
-   }
- }
++Tensor cp_cluster_impl(Tensor boxes, Tensor scores, Tensor dets,
++                       float iou_threshold, float min_score,
++                       int offset, float wfa_thresh, int tune_coords, int opt_id) {
++  return DISPATCH_DEVICE_IMPL(cp_cluster_impl, boxes, scores, dets, iou_threshold,
++                              min_score, offset, wfa_thresh, tune_coords, opt_id);
++}
+
+ Tensor softnms(Tensor boxes, Tensor scores, Tensor dets, float iou_threshold,
+                float sigma, float min_score, int method, int offset) {
+-  return softnms_impl(boxes, scores, dets, iou_threshold, sigma, min_score,
+-                      method, offset);
++  //return softnms_impl(boxes, scores, dets, iou_threshold, sigma, min_score,
++  //                    method, offset);
++  return cp_cluster_impl(boxes, scores, dets, iou_threshold, min_score,
++                         offset, 0.8f, 0, 3);
+}
+
 ~~~
 
 
@@ -148,3 +161,6 @@ python test.py ctdet --exp_id coco_dla_exp1 --arch hourglass --keep_res --nms --
 
 Due to proprietary and patent limitations, for the time being, only CPU implementation of CP-Cluster is open sourced. Full GPU-implementation and looser open source license are in application process.
 
+## License
+
+For the time being, this implementation is published with NVIDIA proprietary license, and the only usage of the source code is to reproduce the experiments of CP-Cluster. For any possible commercial use and redistribution of the code, pls contact ashen@nvidia.com
