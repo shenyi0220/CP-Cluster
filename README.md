@@ -26,7 +26,7 @@ Inspired by belief propagation (BP), we propose the Confidence Propagation Clust
 
 | Method         |    NMS       |     Soft-NMS    |         CP-Cluster       |
 |----------------|--------------|-----------------|--------------------------|
-|FRcnn-fpn50     |  38.4 / 38.7 | 39.0 / 39.2     |    39.2 / 39.4            |
+|FRcnn-fpn50     |  38.4 / 38.7 | 39.0 / 39.2     |    39.2 / 39.4           |
 |Yolov3          |  33.5 / 33.5 | 33.6 / 33.6     |    34.1 / 34.1           |
 |Retina-fpn50    |  37.4 / 37.7 | 37.5 / 37.9     |    38.1 / 38.4           |
 |FCOS-X101       |  42.7 / 42.8 | 42.7 / 42.8     |    42.9 / 43.1           |
@@ -36,14 +36,15 @@ Inspired by belief propagation (BP), we propose the Confidence Propagation Clust
 
 | Model       |     NMS    |    Soft-NMS      |    CP-Cluster   |
 |-------------|------------|------------------|-----------------|
+|Yolov5n      |    28.0    |     28.3         |      28.7       |
 |Yolov5s      |    37.2    |     37.4         |      37.6       |
 |Yolov5m      |    45.2    |     45.3         |      45.6       |
 |Yolov5l      |    48.8    |     48.8         |      49.2       |
 |Yolov5x      |    50.7    |     50.8         |      51.1       |
 |Yolov5s_1280 |    44.5    |     44.6         |      44.9       |
-|Yolov5m_1280 |    51.1    |     51.1         |      51.4       |
+|Yolov5m_1280 |    51.1    |     51.2         |      51.4       |
 |Yolov5l_1280 |    53.6    |     53.7         |      53.9       |
-|Yolov5x_1280 |    54.7    |     54.8         |      55.1       |
+|Yolov5x_1280 |    54.7    |     54.9         |      55.1       |
 
 ### Replace maxpooling with CP-Cluster for Centernet(Evaluated on COCO test-dev), where "flip_scale" means flip and multi-scale augmentations
 
@@ -58,13 +59,13 @@ Inspired by belief propagation (BP), we propose the Confidence Propagation Clust
 
 | Box/Mask AP   |   NMS      |    Soft-NMS      |    CP-Cluster   |
 |-----------------|------------|------------------|-----------------|
-|MRCNN_R50        |  41.5/37.7 |   42.0/37.8      |    42.1/38.0    |
-|MRCNN_R101       |  43.1/38.8 |   43.6/39.0      |    43.6/39.1    |
+|MRCNN_R50        |  41.5/37.7 |   42.0/37.8      |    42.2/38.1    |
+|MRCNN_R101       |  43.1/38.8 |   43.6/39.0      |    43.7/39.2    |
 |MRCNN_X101       |  44.6/40.0 |   45.2/40.2      |    45.2/40.2    |
 
 
 ## Integrate into MMCV
-Clone the mmcv repo from https://github.com/shenyi0220/mmcv (Cut down by 9/28/2021 from main branch with no extra modifications)
+Clone the mmcv repo from https://github.com/shenyi0220/mmcv (Cut down by 1/28/2022 from main branch with no extra modifications)
 
 
 Copy the implementation of "cp_cluster_cpu" in "mmcv/ops/csrc/pytorch/cpu/nms.cpp" to the mmcv nms code("mmcv/ops/csrc/pytorch/cpu/nms.cpp")
@@ -101,7 +102,7 @@ MMCV_WITH_OPS=1 pip install -e .
 
 Make sure that the MMCV with CP-Cluster has been successfully installed.
 
-Download code from https://github.com/shenyi0220/mmdetection (Cut down by 9/26/2021 from main branch with some config file modifications to call Soft-NMS/CP-Cluster), and install all the dependancies accordingly.
+Download code from https://github.com/shenyi0220/mmdetection (Cut down by 12/28/2021 from main branch with some config file modifications to call Soft-NMS/CP-Cluster), and install all the dependancies accordingly.
 
 Download models from model zoo
 
@@ -118,7 +119,7 @@ To check Soft-NMS metrics, just re-compile with mmcv without CP-Cluster modifica
 
 Make sure that the MMCV with CP-Cluster has been successfully installed.
 
-Download code from https://github.com/shenyi0220/yolov5 (Cut down by 11/9/2021 from main branch, replacing the default torchvision.nms with CP-Cluster from mmcv), and install all the dependancies accordingly.
+Download code from https://github.com/shenyi0220/yolov5 (Cut down by 11/29/2021 from main branch, replacing the default torchvision.nms with CP-Cluster from mmcv), and install all the dependancies accordingly.
 
 Run below command to reproduce the CP-Cluster exp with yolov5s-v6
 ~~~
