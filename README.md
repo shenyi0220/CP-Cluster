@@ -6,6 +6,8 @@ Confidence Propagation Cluster aims to replace NMS-based methods as a better box
 > Yichun Shen, Wanli Jiang, Zhen Xu, Rundong Li, Junghyun Kwon, Siyi Li,
 
 ## Updates
+- **May 31th, 2022:** Fix the "time_limit" bug for CP in Yolov5 repo. Update KPIs with yolov5 v6.1 models, then "yolov5x6+TTA" could reach 56.2 mAP on COCO val with CP.
+- **May 29th, 2022:** Rebase mmcv, mmdetection, yolov5 repo to codebase of May 29th. Activate box coordinates in CP by default.
 - **Mar 3rd, 2022:** Accepted by CVPR 2022
 
 ## Abstract
@@ -34,17 +36,18 @@ Inspired by belief propagation (BP), we propose the Confidence Propagation Clust
 
 ### Yolov5(v6 model) on COCO val
 
-| Model       |     NMS    |    Soft-NMS      |    CP-Cluster   |
-|-------------|------------|------------------|-----------------|
-|Yolov5n      |    28.0    |     28.3         |      28.7       |
-|Yolov5s      |    37.2    |     37.4         |      37.6       |
-|Yolov5m      |    45.2    |     45.3         |      45.6       |
-|Yolov5l      |    48.8    |     48.8         |      49.2       |
-|Yolov5x      |    50.7    |     50.8         |      51.1       |
-|Yolov5s_1280 |    44.5    |     44.6         |      44.9       |
-|Yolov5m_1280 |    51.1    |     51.2         |      51.4       |
-|Yolov5l_1280 |    53.6    |     53.7         |      53.9       |
-|Yolov5x_1280 |    54.7    |     54.9         |      55.1       |
+| Model               |     NMS    |    Soft-NMS      |    CP-Cluster   |
+|---------------------|------------|------------------|-----------------|
+|Yolov5n              |    28.0    |     28.3         |      28.5       |
+|Yolov5s              |    37.4    |     37.6         |      38.0       |
+|Yolov5m              |    45.4    |     45.6         |      45.8       |
+|Yolov5l              |    49.0    |     49.1         |      49.4       |
+|Yolov5x              |    50.7    |     50.8         |      51.1       |
+|Yolov5s6_1280        |    44.9    |     45.0         |      45.2       |
+|Yolov5m6_1280        |    51.3    |     51.5         |      51.7       |
+|Yolov5l6_1280        |    53.7    |     53.8         |      54.0       |
+|Yolov5x6_1280        |    55.0    |     55.1         |      55.4       |
+|Yolov5x6_1280_tta    |    55.8    |     55.8         |      56.2       |
 
 ### Replace maxpooling with CP-Cluster for Centernet(Evaluated on COCO test-dev), where "flip_scale" means flip and multi-scale augmentations
 
@@ -65,7 +68,7 @@ Inspired by belief propagation (BP), we propose the Confidence Propagation Clust
 
 
 ## Integrate into MMCV
-Clone the mmcv repo from https://github.com/shenyi0220/mmcv (Cut down by 1/28/2022 from main branch with no extra modifications)
+Clone the mmcv repo from https://github.com/shenyi0220/mmcv (Cut down by 5/29/2022 from main branch with no extra modifications)
 
 
 Copy the implementation of "cp_cluster_cpu" in "mmcv/ops/csrc/pytorch/cpu/nms.cpp" to the mmcv nms code("mmcv/ops/csrc/pytorch/cpu/nms.cpp")
@@ -102,7 +105,7 @@ MMCV_WITH_OPS=1 pip install -e .
 
 Make sure that the MMCV with CP-Cluster has been successfully installed.
 
-Download code from https://github.com/shenyi0220/mmdetection (Cut down by 12/28/2021 from main branch with some config file modifications to call Soft-NMS/CP-Cluster), and install all the dependancies accordingly.
+Download code from https://github.com/shenyi0220/mmdetection (Cut down by 5/29/2022 from main branch with some config file modifications to call Soft-NMS/CP-Cluster), and install all the dependancies accordingly.
 
 Download models from model zoo
 
@@ -119,11 +122,21 @@ To check Soft-NMS metrics, just re-compile with mmcv without CP-Cluster modifica
 
 Make sure that the MMCV with CP-Cluster has been successfully installed.
 
-Download code from https://github.com/shenyi0220/yolov5 (Cut down by 11/29/2021 from main branch, replacing the default torchvision.nms with CP-Cluster from mmcv), and install all the dependancies accordingly.
+Download code from https://github.com/shenyi0220/yolov5 (Cut down by 5/30/2022 from main branch, replacing the default torchvision.nms with CP-Cluster from mmcv), and install all the dependancies accordingly.
 
 Run below command to reproduce the CP-Cluster exp with yolov5s-v6
 ~~~
-python val.py --data coco.yaml --conf 0.001 --iou 0.6 --weights yolov5s.pt --batch-size 32
+python val.py --data coco.yaml --iou 0.6 --weights yolov5s.pt --batch-size 32
+~~~
+
+Run below command to reproduce the CP-Cluster exp with yolov5x6
+~~~
+python val.py --data coco.yaml --iou 0.6 --weights yolov5x6.pt --img 1280 --batch-size 16
+~~~
+
+Run below command to reproduce the CP-Cluster exp with yolov5x6+TTA
+~~~
+python val.py --data coco.yaml --iou 0.6 --weights yolov5x6.pt --img 1536 --batch-size 8 --augment
 ~~~
 
 ## Reproduce CP-Cluster exps with Centernet
