@@ -25,5 +25,5 @@ Tensor softnms(Tensor boxes, Tensor scores, Tensor dets, float iou_threshold,
   //return softnms_impl(boxes, scores, dets, iou_threshold, sigma, min_score,
   //                    method, offset);
   return cp_cluster_impl(boxes, scores, dets, iou_threshold, min_score,
-                         offset, 0.8f, 0, 3);
+                         offset, 0.8f, 1, 3);
 }
