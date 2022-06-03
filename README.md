@@ -6,6 +6,7 @@ Confidence Propagation Cluster aims to replace NMS-based methods as a better box
 > Yichun Shen, Wanli Jiang, Zhen Xu, Rundong Li, Junghyun Kwon, Siyi Li,
 
 ## Updates
+- **June 3rd, 2022:** Applied CP-Cluster to YoloX and achieved 0.45 mAP improvement on average(MS COCO-VAL).
 - **May 31th, 2022:** Fix the "time_limit" bug for CP in Yolov5 repo. Update KPIs with yolov5 v6.1 models, then "yolov5x6+TTA" could reach 56.2 mAP on COCO val with CP.
 - **May 29th, 2022:** Rebase mmcv, mmdetection, yolov5 repo to codebase of May 29th. Activate box coordinates in CP by default.
 - **Mar 3rd, 2022:** Accepted by CVPR 2022
@@ -48,6 +49,13 @@ Inspired by belief propagation (BP), we propose the Confidence Propagation Clust
 |Yolov5l6_1280        |    53.7    |     53.8         |      54.0       |
 |Yolov5x6_1280        |    55.0    |     55.1         |      55.4       |
 |Yolov5x6_1280_tta    |    55.8    |     55.8         |      56.2       |
+
+### YoloX on COCO val
+| Method/mAP   | YoloX-Nano | YoloX-Tiny |  YoloX-S   |  YoloX-M   |  YoloX-L   |  YoloX-X   |
+|--------------|------------|------------|------------|------------|------------|------------|
+|NMS           |    25.8    |     32.8   |      40.5  |      46.9  |      49.7  |      51.1  |
+|CP-Cluster    |    26.4    |     33.4   |      41.0  |      47.3  |      50.1  |      51.4  |
+
 
 ### Replace maxpooling with CP-Cluster for Centernet(Evaluated on COCO test-dev), where "flip_scale" means flip and multi-scale augmentations
 
@@ -137,6 +145,16 @@ python val.py --data coco.yaml --iou 0.6 --weights yolov5x6.pt --img 1280 --batc
 Run below command to reproduce the CP-Cluster exp with yolov5x6+TTA
 ~~~
 python val.py --data coco.yaml --iou 0.6 --weights yolov5x6.pt --img 1536 --batch-size 8 --augment
+~~~
+
+## Reproduce CP-Cluster exps with YoloX
+Make sure that the MMCV with CP-Cluster has been successfully installed.
+
+Download code from https://github.com/shenyi0220/YOLOX (Cut down by 6/3/2022 from main branch, replacing the default torchvision.nms with CP-Cluster from mmcv), and install all the dependancies accordingly.
+
+Run below command to reproduce the CP-Cluster exp with YoloX-m
+~~~
+python -m yolox.tools.eval -n  yolox-m -c yolox_m.pth -b 16 -d 1 --conf 0.001
 ~~~
 
 ## Reproduce CP-Cluster exps with Centernet
