@@ -6,7 +6,7 @@ Confidence Propagation Cluster aims to replace NMS-based methods as a better box
 > Yichun Shen, Wanli Jiang, Zhen Xu, Rundong Li, Junghyun Kwon, Siyi Li,
 
 ## Updates
-- **June 3rd, 2022:** Applied CP-Cluster to YoloX and achieved 0.45 mAP improvement on average(MS COCO-VAL).
+- **June 3rd, 2022:** Applied CP-Cluster to YoloX and achieved 0.45 mAP improvement on average(MS COCO-VAL). Also Exp results for CP on Swin based MASK-RCNN are added!
 - **May 31th, 2022:** Fix the "time_limit" bug for CP in Yolov5 repo. Update KPIs with yolov5 v6.1 models, then "yolov5x6+TTA" could reach 56.2 mAP on COCO val with CP.
 - **May 29th, 2022:** Rebase mmcv, mmdetection, yolov5 repo to codebase of May 29th. Activate box coordinates in CP by default.
 - **Mar 3rd, 2022:** Accepted by CVPR 2022
@@ -74,6 +74,18 @@ Inspired by belief propagation (BP), we propose the Confidence Propagation Clust
 |MRCNN_R101       |  43.1/38.8 |   43.6/39.0      |    43.7/39.2    |
 |MRCNN_X101       |  44.6/40.0 |   45.2/40.2      |    45.2/40.2    |
 
+|Box/Mask AP(val) |   NMS      |    Soft-NMS      |    CP-Cluster   |
+|-----------------|------------|------------------|-----------------|
+|MRCNN_Swin-S     |  48.2/43.2 |   48.9/43.4      |    49.0/43.4    |
+
+Notice that for Mask-RCNN models, we're using a slightly lower IOU threshold(0.45), and CP is configured to be "opt_id=2"(Check below code in "mmcv/ops/csrc/pytorch/nms.cpp"):
+~~~
+ Tensor softnms(Tensor boxes, Tensor scores, Tensor dets, float iou_threshold,
+                float sigma, float min_score, int method, int offset) {
+  return cp_cluster_impl(boxes, scores, dets, iou_threshold, min_score,
+                         offset, 0.8f, 0, 2);
+}
+~~~
 
 ## Integrate into MMCV
 Clone the mmcv repo from https://github.com/shenyi0220/mmcv (Cut down by 5/29/2022 from main branch with no extra modifications)
