@@ -2,8 +2,8 @@
 
 # CP-Cluster
 Confidence Propagation Cluster aims to replace NMS-based methods as a better box fusion framework in 2D/3D Object detection, Instance Segmentation:
-> [**Confidence Propagation Cluster: Unleash the Full Potential of Object Detectors**](https://arxiv.org/abs/2112.00342),
-> Yichun Shen, Wanli Jiang, Zhen Xu, Rundong Li, Junghyun Kwon, Siyi Li,
+> [**Confidence Propagation Cluster: Unleash Full Potential of Object Detectors**](https://openaccess.thecvf.com/content/CVPR2022/html/Shen_Confidence_Propagation_Cluster_Unleash_Full_Potential_of_Object_Detectors_CVPR_2022_paper.html),
+> Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR), 2022, pp. 1151-1161
 
 ## Updates
 - **June 3rd, 2022:** Applied CP-Cluster to YoloX and achieved 0.45 mAP improvement on average(MS COCO-VAL). Also Exp results for CP on Swin based MASK-RCNN are added!
@@ -188,18 +188,24 @@ make
 ~~~
 
 ### Hourglass model
-
+~~~
 python test.py ctdet --exp_id coco_hourglass_bp --arch hourglass --keep_res --nms --pre_cluster_method empty --filter_threshold 0.05 --nms_opt_sna 1 --nms_sna_threshold 0.8 --load_model ../models/ctdet_coco_hg.pth
+~~~
 
 ### Hourglass model with flip and multi-scale
-
+~~~
 python test.py ctdet --exp_id coco_hourglass_bp --arch hourglass --keep_res --nms --pre_cluster_method empty --filter_threshold 0.05 --nms_opt_sna 1 --nms_sna_threshold 0.8 --load_model ../models/ctdet_coco_hg.pth --flip_test --test_scales 0.5,0.75,1,1.25,1.5
+~~~
 
 ### DLA-34 model
+~~~
 python test.py ctdet --exp_id coco_dla_exp1 --arch hourglass --keep_res --nms --pre_cluster_method empty --filter_threshold 0.05 --nms_opt_sna 1 --nms_sna_threshold 0.8 --load_model ../models/ctdet_coco_dla_2x.pth
+~~~
 
 ### DLA-34 model with flip and multi-scale
+~~~
 python test.py ctdet --exp_id coco_dla_exp1 --arch hourglass --keep_res --nms --pre_cluster_method empty --filter_threshold 0.05 --nms_opt_sna 1 --nms_sna_threshold 0.8 --load_model ../models/ctdet_coco_dla_2x.pth --flip_test --test_scales 0.5,0.75,1,1.25,1.5
+~~~
 
 ## Open Source Limitation
 
